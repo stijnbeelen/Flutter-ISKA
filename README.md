@@ -1,5 +1,7 @@
 # Flutter-ISKA
-repo for flutter ISKA
+Public repository with (test) projects for our ISKA in Belgium.
+Following projects are try-outs and not on point.
+Suggestions are always welcome.
 
 ## Projects
 - **first_app**: Standard initial flutter project. 
