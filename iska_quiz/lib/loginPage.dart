@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:iska_quiz/quizState.dart';
 
 class LoginPage extends StatefulWidget {
 
@@ -11,9 +12,10 @@ class LoginPageState extends State<LoginPage> {
   final myController = TextEditingController();
 
   void _startQuiz() {
-//    Navigator.of(context).pushNamed(HomePage)
+    QuizState.name = myController.text;
 
-  Firestore.instance.collection('users').document(myController.text).setData({});
+    Firestore.instance.collection('users').document(QuizState.name).setData({});
+//    Navigator.of(context).pushNamed(HomePage)
 
     /*Navigator.of(context).push(
         new MaterialPageRoute(
