@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatefulWidget {
 
@@ -7,12 +8,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
+  final myController = TextEditingController();
 
   void _startQuiz() {
 //    Navigator.of(context).pushNamed(HomePage)
 
+  Firestore.instance.collection('users').document(myController.text).setData({});
 
-    Navigator.of(context).push(
+    /*Navigator.of(context).push(
         new MaterialPageRoute(
             builder: (BuildContext context) {
 
@@ -32,7 +35,13 @@ class LoginPageState extends State<LoginPage> {
               );
             }
         )
-    );
+    );*/
+  }
+
+  @override
+  void dispose() {
+    myController.dispose();
+    super.dispose();
   }
 
   @override
@@ -66,6 +75,7 @@ class LoginPageState extends State<LoginPage> {
                     fontSize: 20.0,
                     color: Colors.black,
                   ),
+                  controller: myController,
                 )
               )
             ),
