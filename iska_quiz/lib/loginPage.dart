@@ -1,12 +1,39 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
 
   @override
-  State<StatefulWidget> createState() => new HomePageState();
+  State<StatefulWidget> createState() => new LoginPageState();
 }
 
-class HomePageState extends State<HomePage> {
+class LoginPageState extends State<LoginPage> {
+
+  void _startQuiz() {
+//    Navigator.of(context).pushNamed(HomePage)
+
+
+    Navigator.of(context).push(
+        new MaterialPageRoute(
+            builder: (BuildContext context) {
+
+              return new Scaffold(
+                appBar: new AppBar(
+                  title: const Text('Quiz'),
+                  centerTitle: true,
+                ),
+                body: Center(
+                  child: Text(
+                    "Hello there",
+                    style: TextStyle(
+                      fontSize: 15.0
+                    ),
+                  )
+                )
+              );
+            }
+        )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +69,10 @@ class HomePageState extends State<HomePage> {
                 )
               )
             ),
+            RaisedButton(
+              onPressed: _startQuiz,
+              child: Text("Start Quiz"),
+            )
           ],
         ),
       ),
