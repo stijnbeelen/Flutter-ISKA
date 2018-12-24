@@ -1,48 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:iska_quiz/quizPage.dart';
 import 'package:iska_quiz/quizState.dart';
 
 class LoginPage extends StatefulWidget {
+  static String tag = "login-page";
 
   @override
-  State<StatefulWidget> createState() => new LoginPageState();
+  State<StatefulWidget> createState() => LoginPageState();
 }
 
 class LoginPageState extends State<LoginPage> {
-  final myController = TextEditingController();
+  final loginController = TextEditingController();
+  String errorMessage = "";
 
   void _startQuiz() {
-    QuizState.name = myController.text;
+    QuizState.name = loginController.text;
 
-    Firestore.instance.collection('users').document(QuizState.name).setData({});
-//    Navigator.of(context).pushNamed(HomePage)
+    DocumentReference ref =
+        Firestore.instance.document('users/' + QuizState.name);
 
-    /*Navigator.of(context).push(
-        new MaterialPageRoute(
-            builder: (BuildContext context) {
-
-              return new Scaffold(
-                appBar: new AppBar(
-                  title: const Text('Quiz'),
-                  centerTitle: true,
-                ),
-                body: Center(
-                  child: Text(
-                    "Hello there",
-                    style: TextStyle(
-                      fontSize: 15.0
-                    ),
-                  )
-                )
-              );
-            }
-        )
-    );*/
+    ref.snapshots().listen((snapshot) {
+      if (snapshot.exists) {
+        print('existing name');
+        errorMessage =
+            "That username is already taken. Please choose another one.";
+      } else {
+        Firestore.instance
+            .collection('users')
+            .document(QuizState.name)
+            .setData({});
+        Navigator.of(context).pushReplacementNamed(QuizPage.tag);
+      }
+    });
   }
 
   @override
   void dispose() {
-    myController.dispose();
+    loginController.dispose();
     super.dispose();
   }
 
@@ -59,9 +54,9 @@ class LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 300.0,
-              child: (
-                TextField(
+                width: 300.0,
+                child: (TextField(
+                  controller: loginController,
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
                     border: UnderlineInputBorder(
@@ -77,13 +72,21 @@ class LoginPageState extends State<LoginPage> {
                     fontSize: 20.0,
                     color: Colors.black,
                   ),
-                  controller: myController,
-                )
-              )
-            ),
+                ))),
             RaisedButton(
               onPressed: _startQuiz,
               child: Text("Start Quiz"),
+            ),
+            Container(
+              width: 250.0,
+              child: Text(
+                errorMessage,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             )
           ],
         ),
@@ -91,4 +94,3 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 }
-
