@@ -30,7 +30,9 @@ class LoginPageState extends State<LoginPage> {
             .collection('users')
             .document(QuizState.name)
             .setData({});
-        Navigator.of(context).pushReplacementNamed(QuizPage.tag);
+
+//        Navigator.of(context).pushReplacementNamed(QuizPage.tag); //throws away login screen
+        Navigator.of(context).pushNamed(QuizPage.tag); //keeps login screen -> debugging purposes
       }
     });
   }
