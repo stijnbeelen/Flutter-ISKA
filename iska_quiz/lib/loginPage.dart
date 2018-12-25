@@ -17,22 +17,20 @@ class LoginPageState extends State<LoginPage> {
   void _startQuiz() {
     QuizState.name = loginController.text;
 
-    DocumentReference ref =
-        Firestore.instance.document('users/' + QuizState.name);
+    DocumentReference ref = Firestore.instance.collection('users').document(QuizState.name);
+    QuizState.userReference = ref;
 
     ref.snapshots().listen((snapshot) {
       if (snapshot.exists) {
         print('existing name');
-        errorMessage =
-            "That username is already taken. Please choose another one.";
+        errorMessage = "That username is already taken. Please choose another one.";
       } else {
-        Firestore.instance
-            .collection('users')
-            .document(QuizState.name)
-            .setData({});
-
-//        Navigator.of(context).pushReplacementNamed(QuizPage.tag); //throws away login screen
-        Navigator.of(context).pushNamed(QuizPage.tag); //keeps login screen -> debugging purposes
+        Firestore.instance.runTransaction((transaction) async {
+          LinearProgressIndicator();
+          await transaction.set(QuizState.userReference, {});
+//          Navigator.of(context).pushReplacementNamed(QuizPage.tag); //throws away login screen
+          Navigator.of(context).pushNamed(QuizPage.tag); //keeps login screen -> debugging purposes
+        });
       }
     });
   }

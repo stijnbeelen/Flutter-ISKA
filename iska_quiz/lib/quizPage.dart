@@ -11,6 +11,7 @@ class QuizPage extends StatefulWidget {
 class QuizPageState extends State<QuizPage> {
   final quizController = TextEditingController();
 
+  //todo: retrieve questions from firestore + store questions
 
   @override
   void dispose() {
@@ -18,45 +19,42 @@ class QuizPageState extends State<QuizPage> {
     super.dispose();
   }
 
+  Widget _question(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 70.0),
+      child: Text(
+        QuizState.questions[QuizState.currentQuestion],
+        style: TextStyle(
+          fontSize: 24.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
 
-
-    Widget _question(BuildContext context) {
-      return Container(
-        margin: EdgeInsets.only(bottom: 70.0),
-        child: Text(
-          'First question:',
-          style: TextStyle(
-            fontSize: 24.0,
-            fontWeight: FontWeight.bold,
+  Widget _answer(BuildContext context) {
+    return TextField(
+      controller: quizController,
+      textAlign: TextAlign.center,
+      decoration: InputDecoration(
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(
+            width: 2.0,
+            style: BorderStyle.solid,
+            color: Colors.blue,
           ),
         ),
-      );
-    }
+        hintText: 'Answer here.',
+      ),
+    );
+  }
 
-    Widget _answer(BuildContext context) {
-      return TextField(
-        controller: quizController,
-        textAlign: TextAlign.center,
-        decoration: InputDecoration(
-          border: UnderlineInputBorder(
-            borderSide: BorderSide(
-              width: 2.0,
-              style: BorderStyle.solid,
-              color: Colors.blue,
-            ),
-          ),
-          hintText: 'Answer here.',
-        ),
-      );
-    }
-
-    Widget _button(BuildContext context) {
-      return RaisedButton(
-        onPressed: () => print("Quiz is starting"),
-        child: Text("Answer"),
-      );
-    }
-
+  Widget _button(BuildContext context) {
+    return RaisedButton(
+      onPressed: () => print("Quiz is starting"),
+      child: Text("Answer"),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
