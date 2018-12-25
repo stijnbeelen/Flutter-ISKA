@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iska_quiz/quizState.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class QuizPage extends StatefulWidget {
   static String tag = "quizpage";
@@ -13,6 +14,31 @@ class QuizPageState extends State<QuizPage> {
 
   //todo: retrieve questions from firestore + store questions
 
+  Widget _currentQuestion(BuildContext context) {
+    return StreamBuilder<DocumentSnapshot>(
+      stream: Firestore.instance
+          .collection('questions')
+          .document('current')
+          .snapshots(),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return new Center(child: LinearProgressIndicator());
+          default:
+            var id = snapshot.data.data.values.first;
+            print(id);
+            return Text(
+                QuizState.questions[id],
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ));
+        }
+      },
+    );
+  }
+
   @override
   void dispose() {
     quizController.dispose();
@@ -22,13 +48,7 @@ class QuizPageState extends State<QuizPage> {
   Widget _question(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 70.0),
-      child: Text(
-        QuizState.questions[QuizState.currentQuestion],
-        style: TextStyle(
-          fontSize: 24.0,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      child: _currentQuestion(context)
     );
   }
 
