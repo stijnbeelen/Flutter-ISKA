@@ -15,26 +15,33 @@ class LoginPageState extends State<LoginPage> {
   String errorMessage = "";
 
   void _startQuiz() {
-    QuizState.name = loginController.text;
+    var id = loginController.text;
+    var userRef = users().document(id);
 
-    DocumentReference ref =
-        Firestore.instance.collection('users').document(QuizState.name);
-    QuizState.userReference = ref;
+    userRef.get().then((snapshot) => checkAndCreate(userRef, snapshot),
+        onError: (error) => this.showError('Something went wrong'));
+  }
 
-    ref.snapshots().listen((snapshot) {
-      if (snapshot.exists) {
-        print('existing name');
-        errorMessage =
-            "That username is already taken. Please choose another one.";
-      } else {
-        Firestore.instance.runTransaction((transaction) async {
-          await transaction.set(QuizState.userReference, {});
-//          Navigator.of(context).pushReplacementNamed(QuizPage.tag); //throws away login screen
-          Navigator.of(context).pushNamed(
-              QuizPage.tag); //keeps login screen -> debugging purposes
-        });
-      }
+  void showError(String text) {
+    setState(() {
+      errorMessage = text;
     });
+  }
+
+  checkAndCreate(DocumentReference reference, DocumentSnapshot snapshot) {
+    if (snapshot.exists) {
+      showError(snapshot.documentID + ' already exists.');
+    } else {
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction.set(reference, {});
+        QuizState.name = snapshot.documentID;
+        Navigator.of(context).pushReplacementNamed(QuizPage.tag);
+      });
+    }
+  }
+
+  CollectionReference users() {
+    return Firestore.instance.collection('users');
   }
 
   @override
