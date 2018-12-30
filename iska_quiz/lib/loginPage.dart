@@ -89,6 +89,7 @@ class LoginPageState extends State<LoginPage> {
               width: 250.0,
               child: Text(
                 errorMessage,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 16.0,
