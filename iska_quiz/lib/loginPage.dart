@@ -17,6 +17,7 @@ class LoginPageState extends State<LoginPage> {
   void _startQuiz() {
     var id = loginController.text;
     var userRef = users().document(id);
+    QuizState.userReference = userRef;
 
     userRef.get().then((snapshot) => checkAndCreate(userRef, snapshot),
         onError: (error) => this.showError('Something went wrong'));
