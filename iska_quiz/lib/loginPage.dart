@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:iska_quiz/loginLayout.dart';
 import 'package:iska_quiz/quizPage.dart';
 import 'package:iska_quiz/quizState.dart';
 
@@ -14,7 +15,7 @@ class LoginPageState extends State<LoginPage> {
   final loginController = TextEditingController();
   String errorMessage = "";
 
-  void _startQuiz() {
+  void startQuiz() {
     var id = loginController.text;
     var userRef = users().document(id);
 
@@ -52,53 +53,6 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Flutter Quiz'),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-                width: 300.0,
-                child: (TextField(
-                  controller: loginController,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 2.0,
-                        style: BorderStyle.solid,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    hintText: 'Please enter your name.',
-                  ),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.black,
-                  ),
-                ))),
-            RaisedButton(
-              onPressed: _startQuiz,
-              child: Text("Start Quiz"),
-            ),
-            Container(
-              width: 250.0,
-              child: Text(
-                errorMessage,
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+    return LoginLayout(this);
   }
 }
