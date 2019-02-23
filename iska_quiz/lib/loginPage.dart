@@ -12,15 +12,24 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
-  final loginController = TextEditingController();
+  String username = "";
   String errorMessage = "";
 
-  void startQuiz() {
-    var id = loginController.text;
+  void startQuiz(String id) {
+    clearError();
     var userRef = users().document(id);
 
-    userRef.get().then((snapshot) => checkAndCreate(userRef, snapshot),
+    userRef.get()
+        .then((snapshot) => checkAndCreate(userRef, snapshot),
         onError: (error) => this.showError('Something went wrong'));
+  }
+
+  void clearError() {
+    print(username);
+    setState(() {
+      errorMessage = "";
+    });
+    print(username);
   }
 
   void showError(String text) {
@@ -30,6 +39,7 @@ class LoginPageState extends State<LoginPage> {
   }
 
   checkAndCreate(DocumentReference reference, DocumentSnapshot snapshot) {
+    print("User " + snapshot.documentID + (snapshot.exists ? " already exists." : " was created."));
     if (snapshot.exists) {
       showError(snapshot.documentID + ' already exists.');
     } else {
@@ -47,7 +57,6 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    loginController.dispose();
     super.dispose();
   }
 
