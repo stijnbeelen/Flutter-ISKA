@@ -18,6 +18,7 @@ class LoginPageState extends State<LoginPage> {
   void startQuiz(String id) {
     clearError();
     var userRef = users().document(id);
+    QuizState.userReference = userRef;
 
     userRef.get()
         .then((snapshot) => checkAndCreate(userRef, snapshot),

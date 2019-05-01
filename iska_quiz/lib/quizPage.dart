@@ -12,7 +12,32 @@ class QuizPage extends StatefulWidget {
 class QuizPageState extends State<QuizPage> {
   final quizController = TextEditingController();
 
+
+  @override
+  void initState() {
+    super.initState();
+
+    Firestore.instance.collection("questions").snapshots().forEach((snapshot) {
+      snapshot.documents.forEach((docSnapshot) {
+        if (docSnapshot.documentID != "current") {
+          if (!QuizState.questions.contains(docSnapshot['question'])) {
+            QuizState.questions.add(docSnapshot['question']);
+          }
+        }
+      });
+    });
+
+    print(QuizState.questions);
+  }
+
   //todo: retrieve questions from firestore + store questions
+
+  Widget _question(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 70.0),
+      child: _currentQuestion(context)
+    );
+  }
 
   Widget _currentQuestion(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
@@ -26,7 +51,7 @@ class QuizPageState extends State<QuizPage> {
             return new Center(child: LinearProgressIndicator());
           default:
             var id = snapshot.data.data.values.first;
-            print(id);
+            QuizState.currentQuestion = id;
             return Text(
                 QuizState.questions[id],
                 textAlign: TextAlign.center,
@@ -36,19 +61,6 @@ class QuizPageState extends State<QuizPage> {
                 ));
         }
       },
-    );
-  }
-
-  @override
-  void dispose() {
-    quizController.dispose();
-    super.dispose();
-  }
-
-  Widget _question(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 70.0),
-      child: _currentQuestion(context)
     );
   }
 
@@ -71,9 +83,21 @@ class QuizPageState extends State<QuizPage> {
 
   Widget _button(BuildContext context) {
     return RaisedButton(
-      onPressed: () => print("Quiz is starting"),
+      onPressed: () => _uploadAnswer(),
       child: Text("Answer"),
     );
+  }
+
+  void _uploadAnswer() {
+    Firestore.instance.runTransaction((transaction) {
+      transaction.update(QuizState.userReference, {"${QuizState.currentQuestion}" : quizController.text });
+    });
+  }
+
+  @override
+  void dispose() {
+    quizController.dispose();
+    super.dispose();
   }
 
   @override
