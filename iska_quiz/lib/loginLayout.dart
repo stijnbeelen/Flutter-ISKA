@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:iska_quiz/components/core/button.dart';
+import 'package:iska_quiz/components/logoImage.dart';
+import 'package:iska_quiz/components/strings.dart';
 import 'package:iska_quiz/loginPage.dart';
 
 class LoginLayout extends StatelessWidget {
@@ -20,10 +23,24 @@ class LoginLayout extends StatelessWidget {
         ),
         body: Container(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              Container(child: Image(image: AssetImage("lib/img/is_logo.png")), padding: EdgeInsets.all(50.0),),
-              Container(child: RaisedButton(onPressed: _handleStart, child: Text('Start Quiz')), width: 150,)
+              Container(
+                padding: EdgeInsets.all(60.0),
+                child: new IskaLogo(),
+              ),
+              Container(
+                padding: EdgeInsets.all(20.0),
+                child: Text(Strings.hypeText, textAlign: TextAlign.center, style: TextStyle(fontSize: 16)),
+              ),
+              Container(
+                padding: EdgeInsets.all(60.0),
+                child: IskaButton(
+                    onPressed: _handleStart,
+                    text: Strings.startQuiz,
+                    width: 250,
+                    height: 70),
+              )
             ],
           ),
         ));
