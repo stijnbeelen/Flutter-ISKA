@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:iska_quiz/loginLayout.dart';
 import 'package:iska_quiz/quizPage.dart';
 import 'package:iska_quiz/quizState.dart';
 
@@ -11,16 +12,23 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
-  final loginController = TextEditingController();
+  String username = "";
   String errorMessage = "";
 
-  void _startQuiz() {
-    var id = loginController.text;
+  void startQuiz(String id) {
+    clearError();
     var userRef = users().document(id);
     QuizState.userReference = userRef;
 
-    userRef.get().then((snapshot) => checkAndCreate(userRef, snapshot),
+    userRef.get()
+        .then((snapshot) => checkAndCreate(userRef, snapshot),
         onError: (error) => this.showError('Something went wrong'));
+  }
+
+  void clearError() {
+    setState(() {
+      errorMessage = "";
+    });
   }
 
   void showError(String text) {
@@ -30,6 +38,7 @@ class LoginPageState extends State<LoginPage> {
   }
 
   checkAndCreate(DocumentReference reference, DocumentSnapshot snapshot) {
+    print("User " + snapshot.documentID + (snapshot.exists ? " already exists." : " was created."));
     if (snapshot.exists) {
       showError(snapshot.documentID + ' already exists.');
     } else {
@@ -47,60 +56,11 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    loginController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Flutter Quiz'),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-                width: 300.0,
-                child: (TextField(
-                  controller: loginController,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 2.0,
-                        style: BorderStyle.solid,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    hintText: 'Please enter your name.',
-                  ),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.black,
-                  ),
-                ))),
-            RaisedButton(
-              onPressed: _startQuiz,
-              child: Text("Start Quiz"),
-            ),
-            Container(
-              width: 250.0,
-              child: Text(
-                errorMessage,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+    return LoginLayout(this);
   }
 }

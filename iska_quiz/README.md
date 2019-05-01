@@ -2,6 +2,10 @@
 
 Quiz appplication for ISKA 2019.
 
+## Useful dev tips
+
+Alt + Enter on a Container Widget -> wrap with new widget
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

@@ -1,0 +1,4 @@
+Setup even zoeken:
+    flutter doctor niet altijd even duidelijk. (zie afbeeldingen)
+
+W: Layout in de componenten zelf schrijven is wennen als je Android gewoon bent.
