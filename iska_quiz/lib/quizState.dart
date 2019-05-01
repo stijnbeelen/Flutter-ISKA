@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:iska_quiz/player.dart';
 
 class QuizState {
-  //todo: use player class instead of name
+  static Player currentPlayer;
   static String name;
   static DocumentReference userReference;
   static List<String> answers;

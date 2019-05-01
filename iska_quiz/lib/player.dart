@@ -28,8 +28,8 @@ class Player {
   }
 
   /// default constructor
-  Player(String name) {
-    this._id = 4;
+  Player(int id, String name) {
+    this._id = id;
     this._name = name;
     this._score = 0;
   }

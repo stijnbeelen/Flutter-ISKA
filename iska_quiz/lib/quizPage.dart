@@ -94,18 +94,17 @@ class QuizPageState extends State<QuizPage> {
     return Firestore.instance.collection('quizzes').document('FlutterIskaQuiz');
   }
 
-  void _uploadAnswer() {
-
-//    iskaQuiz().get().then((document) {
-//      print(document['players'][0]);
-//      print(document['questions'][0]);
-//    });
-
-
+  Future _uploadAnswer() async {
 
     //todo: move underlying logic to login page
-    var toby = new Player("Toby");
-    FirestoreHelper.iskaQuiz().updateData({"players": FieldValue.arrayUnion([toby.toJsonObject()])});
+
+    var players = await FirestoreHelper.players();
+    var toby = new Player(players.length + 1, "Toby");
+
+    toby.incrementScore(5);
+
+    var quiz = await FirestoreHelper.iskaQuiz();
+    quiz.updateData({"players": FieldValue.arrayUnion([toby.toJsonObject()])});
 
 //    Firestore.instance.runTransaction((transaction) {
 //      transaction.update(QuizState.userReference, {"${QuizState.currentQuestion}" : quizController.text });
