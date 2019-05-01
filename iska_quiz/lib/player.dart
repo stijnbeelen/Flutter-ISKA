@@ -45,4 +45,8 @@ class Player {
   void incrementScore(int increment) {
     _score += increment;
   }
+
+  Object toJsonObject() {
+    return {"id" : _id, "name": _name, "score": _score};
+  }
 }

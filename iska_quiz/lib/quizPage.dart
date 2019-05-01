@@ -105,10 +105,7 @@ class QuizPageState extends State<QuizPage> {
 
     //todo: move underlying logic to login page
     var toby = new Player("Toby");
-    print(toby.name + " has id " + toby.id.toString());
-    var tobyDto = {"name": toby.name, "score": toby.score, "id" : toby.id};
-
-    FirestoreHelper.iskaQuiz().updateData({"players": FieldValue.arrayUnion([tobyDto])});
+    FirestoreHelper.iskaQuiz().updateData({"players": FieldValue.arrayUnion([toby.toJsonObject()])});
 
 //    Firestore.instance.runTransaction((transaction) {
 //      transaction.update(QuizState.userReference, {"${QuizState.currentQuestion}" : quizController.text });
