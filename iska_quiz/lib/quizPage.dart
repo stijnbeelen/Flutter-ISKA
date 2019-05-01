@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iska_quiz/firestoreHelper.dart';
+import 'package:iska_quiz/player.dart';
 import 'package:iska_quiz/quizState.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -100,10 +101,13 @@ class QuizPageState extends State<QuizPage> {
 //      print(document['questions'][0]);
 //    });
 
-    var players = [{"name": "Wannes", "score": 0, "id" : 1}, {"name": "Stijn", "score": 0, "id" : 2}];
-    var silke = {"name": "Silke", "score": 0, "id" : 3};
 
-    FirestoreHelper.iskaQuiz().updateData({"players": FieldValue.arrayUnion([silke])});
+
+    var toby = new Player("Toby");
+    print(toby.name + " has id " + toby.id.toString());
+    var tobyDto = {"name": toby.name, "score": toby.score, "id" : toby.id};
+
+    FirestoreHelper.iskaQuiz().updateData({"players": FieldValue.arrayUnion([tobyDto])});
 
 //    Firestore.instance.runTransaction((transaction) {
 //      transaction.update(QuizState.userReference, {"${QuizState.currentQuestion}" : quizController.text });
