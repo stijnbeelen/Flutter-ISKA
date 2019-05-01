@@ -103,6 +103,7 @@ class QuizPageState extends State<QuizPage> {
 
 
 
+    //todo: move underlying logic to login page
     var toby = new Player("Toby");
     print(toby.name + " has id " + toby.id.toString());
     var tobyDto = {"name": toby.name, "score": toby.score, "id" : toby.id};

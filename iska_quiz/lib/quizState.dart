@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class QuizState {
+  //todo: use player class instead of name
   static String name;
   static DocumentReference userReference;
   static List<String> answers;
