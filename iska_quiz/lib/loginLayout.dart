@@ -19,6 +19,10 @@ class LoginLayout extends StatelessWidget {
     }
   }
 
+  void _clearError(String newValue) {
+    //this.loginPageState.showError("");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +48,7 @@ class LoginLayout extends StatelessWidget {
                 Container(
                   child: new TextField(
                     controller: this.userNameController,
-                    decoration: new InputDecoration(hintText: 'Username'),
+                    decoration: new InputDecoration(hintText: 'Username'), onChanged: _clearError,
                   ),
                   width: 250,
                   margin: EdgeInsets.fromLTRB(0, 0, 0, 10),

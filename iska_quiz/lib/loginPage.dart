@@ -25,11 +25,9 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void clearError() {
-    print(username);
     setState(() {
       errorMessage = "";
     });
-    print(username);
   }
 
   void showError(String text) {

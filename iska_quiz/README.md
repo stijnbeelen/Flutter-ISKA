@@ -2,7 +2,7 @@
 
 Quiz appplication for ISKA 2019.
 
-## Usefull dev tips
+## Useful dev tips
 
 Alt + Enter on a Container Widget -> wrap with new widget
 
