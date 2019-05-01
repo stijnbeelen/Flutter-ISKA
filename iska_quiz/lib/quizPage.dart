@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iska_quiz/firestoreHelper.dart';
 import 'package:iska_quiz/quizState.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -88,10 +89,25 @@ class QuizPageState extends State<QuizPage> {
     );
   }
 
+  DocumentReference iskaQuiz() {
+    return Firestore.instance.collection('quizzes').document('FlutterIskaQuiz');
+  }
+
   void _uploadAnswer() {
-    Firestore.instance.runTransaction((transaction) {
-      transaction.update(QuizState.userReference, {"${QuizState.currentQuestion}" : quizController.text });
-    });
+
+//    iskaQuiz().get().then((document) {
+//      print(document['players'][0]);
+//      print(document['questions'][0]);
+//    });
+
+    var players = [{"name": "Wannes", "score": 0, "id" : 1}, {"name": "Stijn", "score": 0, "id" : 2}];
+    var silke = {"name": "Silke", "score": 0, "id" : 3};
+
+    FirestoreHelper.iskaQuiz().updateData({"players": FieldValue.arrayUnion([silke])});
+
+//    Firestore.instance.runTransaction((transaction) {
+//      transaction.update(QuizState.userReference, {"${QuizState.currentQuestion}" : quizController.text });
+//    });
   }
 
   @override
