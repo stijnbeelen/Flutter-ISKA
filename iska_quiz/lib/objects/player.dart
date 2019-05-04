@@ -1,15 +1,12 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// player class to store all info on players.
 class Player {
   // _ makes field private in library
-  int _id;
   String _name;
   int _score;
-
-  /// getter for _id
-  int get id {
-    return _id;
-  }
+  DocumentReference firestoreReference;
 
   /// getter for _score
   int get score {
@@ -21,22 +18,15 @@ class Player {
     return _name;
   }
 
-  /// setter for _name field
-  set name(String name) {
-    this._name = name;
-  }
-
   /// default constructor
-  Player(int id, String name) {
-    this._id = id;
-    this._name = name;
+  Player(this._name, this.firestoreReference) {
     this._score = 0;
   }
 
   /// constructor overloading
-  Player.allArgs(int id, String name, int score) {
-    this._id = 0;
+  Player.allArgs(String name, DocumentReference firestoreReference, int score) {
     this._name = name;
+    this.firestoreReference = firestoreReference;
     this._score = score;
   }
 
@@ -45,7 +35,10 @@ class Player {
     _score += increment;
   }
 
-  Object toJsonObject() {
-    return {"id" : _id, "name": _name, "score": _score};
-  }
+  Player.fromJson(Map<String, dynamic> json)
+      : _name = json['name'],
+        _score = json['score'];
+
+  Map<String, dynamic> toJson() => {"name": _name, "score": _score};
+
 }

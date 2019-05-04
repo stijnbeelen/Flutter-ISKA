@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:iska_quiz/firestoreHelper.dart';
 import 'package:iska_quiz/loginLayout.dart';
+import 'package:iska_quiz/objects/player.dart';
 import 'package:iska_quiz/quizPage.dart';
 import 'package:iska_quiz/quizState.dart';
 
@@ -15,14 +17,13 @@ class LoginPageState extends State<LoginPage> {
   String username = "";
   String errorMessage = "";
 
-  void startQuiz(String id) {
+  void startQuiz(String playerId) async {
     clearError();
-    var userRef = users().document(id);
-    QuizState.userReference = userRef;
+    var userRef = FirestoreHelper.players.document(playerId);
 
     userRef.get()
         .then((snapshot) => checkAndCreate(userRef, snapshot),
-        onError: (error) => this.showError('Something went wrong'));
+        onError: (error) => this.showError("Something went wrong while creating user $playerId"));
   }
 
   void clearError() {
@@ -37,21 +38,19 @@ class LoginPageState extends State<LoginPage> {
     });
   }
 
-  checkAndCreate(DocumentReference reference, DocumentSnapshot snapshot) {
-    print("User " + snapshot.documentID + (snapshot.exists ? " already exists." : " was created."));
+  checkAndCreate(DocumentReference playerReference, DocumentSnapshot snapshot) {
+    print("Player ${snapshot.documentID} ${snapshot.exists ? " already exists" : " was created"}.");
+
     if (snapshot.exists) {
-      showError(snapshot.documentID + ' already exists.');
+      showError("${snapshot.documentID} already exists.");
     } else {
       Firestore.instance.runTransaction((transaction) async {
-        await transaction.set(reference, {});
-        QuizState.name = snapshot.documentID;
+        QuizState.currentPlayer = new Player(snapshot.documentID, playerReference);
+        await transaction.set(playerReference, QuizState.currentPlayer.toJson());
+
         Navigator.of(context).pushReplacementNamed(QuizPage.tag);
       });
     }
-  }
-
-  CollectionReference users() {
-    return Firestore.instance.collection('users');
   }
 
   @override

@@ -6,9 +6,8 @@ class FirestoreHelper {
     return Firestore.instance.collection('quizzes').document('FlutterIskaQuiz');
   }
 
-  static dynamic players() async {
-    var quiz = await iskaQuiz();
-    var quizDoc = await quiz.get();
-    return quizDoc['players'];
-  }
+  static CollectionReference get players => Firestore.instance.collection('quizzes').document('FlutterIskaQuiz').collection('players');
+
+  static CollectionReference get questions => Firestore.instance.collection('quizzes').document('FlutterIskaQuiz').collection('questions');
+
 }
