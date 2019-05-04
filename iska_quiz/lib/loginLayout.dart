@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:iska_quiz/components/core/button.dart';
-import 'package:iska_quiz/components/logoImage.dart';
-import 'package:iska_quiz/components/strings.dart';
+import 'package:iska_quiz/widgets/core/button.dart';
+import 'package:iska_quiz/widgets/logoImage.dart';
+import 'package:iska_quiz/widgets/strings.dart';
 import 'package:iska_quiz/loginPage.dart';
 
 class LoginLayout extends StatelessWidget {

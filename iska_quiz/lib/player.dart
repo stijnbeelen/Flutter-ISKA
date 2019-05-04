@@ -1,4 +1,3 @@
-import 'package:iska_quiz/firestoreHelper.dart';
 
 /// player class to store all info on players.
 class Player {

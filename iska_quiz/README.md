@@ -5,6 +5,7 @@ Quiz appplication for ISKA 2019.
 ## Useful dev tips
 
 Alt + Enter on a Container Widget -> wrap with new widget
+When text is altered, Hot reload doesn't always work
 
 ## Getting Started
 
