@@ -5,6 +5,9 @@ Quiz appplication for ISKA 2019.
 ## Useful dev tips
 
 Alt + Enter on a Container Widget -> wrap with new widget
+When text is altered, Hot reload doesn't always work
+Function overloading is NOT supported in Dart -> optional named/unnamed parameters
+String interpolation: "$name", "${player.name}", "${exists ? "it exists" = "it does not exist"}"
 
 ## Getting Started
 

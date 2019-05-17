@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:iska_quiz/components/style/textstyle.dart';
+import 'package:iska_quiz/widgets/style/textstyle.dart';
 
 class IskaButton extends StatelessWidget {
   IskaButton(
