@@ -19,11 +19,10 @@ class LoginPageState extends State<LoginPage> {
 
   void startQuiz(String playerId) async {
     clearError();
+
     var userRef = FirestoreHelper.players.document(playerId);
 
-    userRef.get()
-        .then((snapshot) => checkAndCreate(userRef, snapshot),
-        onError: (error) => this.showError("Something went wrong while creating user $playerId"));
+    checkAndCreate(playerId, userRef);
   }
 
   void clearError() {
@@ -38,19 +37,18 @@ class LoginPageState extends State<LoginPage> {
     });
   }
 
-  checkAndCreate(DocumentReference playerReference, DocumentSnapshot snapshot) {
-    print("Player ${snapshot.documentID} ${snapshot.exists ? " already exists" : " was created"}.");
-
-    if (snapshot.exists) {
-      showError("${snapshot.documentID} already exists.");
-    } else {
-      Firestore.instance.runTransaction((transaction) async {
-        QuizState.currentPlayer = new Player(snapshot.documentID, playerReference);
-        await transaction.set(playerReference, QuizState.currentPlayer.toJson());
-
+  checkAndCreate(String playerId, DocumentReference playerReference) async {
+    await Firestore.instance.runTransaction((Transaction transaction) async {
+      DocumentSnapshot snap = await transaction.get(playerReference);
+      if (snap.exists) {
+        showError("${snap.documentID} already exists.");
+      } else {
+        QuizState.currentPlayer = new Player(snap.documentID, playerReference);
+        await transaction.set(
+            playerReference, QuizState.currentPlayer.toJson());
         Navigator.of(context).pushReplacementNamed(QuizPage.tag);
-      });
-    }
+      }
+    });
   }
 
   @override
