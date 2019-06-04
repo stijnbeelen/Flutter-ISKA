@@ -5,7 +5,6 @@ import 'package:iska_quiz/quizPage.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-
   final routes = <String, WidgetBuilder>{
     LoginPage.tag: (context) => LoginPage(),
     QuizPage.tag: (context) => QuizPage(),
@@ -19,7 +18,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-//      home: MyHomePage(title: 'Flutter Demo Home Page'),
       home: LoginPage(),
       routes: routes,
     );
