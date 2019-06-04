@@ -21,3 +21,8 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our 
 [online documentation](https://flutter.io/docs), which offers tutorials, 
 samples, guidance on mobile development, and a full API reference.
+
+## Presentation Remarks
+Setup even zoeken: flutter doctor niet altijd even duidelijk. (zie afbeeldingen)
+
+W: Layout in de componenten zelf schrijven is wennen als je Android gewoon bent.
