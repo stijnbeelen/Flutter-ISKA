@@ -26,3 +26,6 @@ samples, guidance on mobile development, and a full API reference.
 Setup even zoeken: flutter doctor niet altijd even duidelijk. (zie afbeeldingen)
 
 W: Layout in de componenten zelf schrijven is wennen als je Android gewoon bent.
+
+More info about the BLoC architectural pattern later.
+In the meantime, [Reactive Programming - Streams - BLoC](https://www.didierboelens.com/2018/08/reactive-programming---streams---bloc/) by [Didier Boelens](https://www.didierboelens.com/) is a great resource.
