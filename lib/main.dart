@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:iska_quiz/loginPage.dart';
-import 'package:iska_quiz/quizPage.dart';
+import 'package:iska_quiz/login/login_page.dart';
+import 'package:iska_quiz/quiz/quiz_page.dart';
 
 void main() => runApp(MyApp());
 

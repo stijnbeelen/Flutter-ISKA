@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:iska_quiz/firestoreHelper.dart';
+import 'package:iska_quiz/firestore_helper.dart';
 import 'package:iska_quiz/objects/player.dart';
-import 'package:iska_quiz/quizState.dart';
 
 class LoginEvent {
   String _playerId;
@@ -15,15 +14,24 @@ class LoginEvent {
 
 class LoginBLoC {
   final _loginEventStreamController = StreamController<LoginEvent>();
+
   StreamSink<LoginEvent> get loginEventSink => _loginEventStreamController.sink;
-  Stream<LoginEvent> get _streamLoginEvent => _loginEventStreamController.stream;
+
+  Stream<LoginEvent> get _streamLoginEvent =>
+      _loginEventStreamController.stream;
 
   final _loginErrorStreamController = StreamController<String>();
-  StreamSink<String> get _loginErrorStreamSink => _loginErrorStreamController.sink;
+
+  StreamSink<String> get _loginErrorStreamSink =>
+      _loginErrorStreamController.sink;
+
   Stream<String> get streamLoginError => _loginErrorStreamController.stream;
 
   final _loginSuccessStreamController = StreamController<bool>();
-  StreamSink<bool> get _loginSuccessStreamSink => _loginSuccessStreamController.sink;
+
+  StreamSink<bool> get _loginSuccessStreamSink =>
+      _loginSuccessStreamController.sink;
+
   Stream<bool> get streamLoginSuccess => _loginSuccessStreamController.stream;
 
   void loginRequestReceived(LoginEvent event) async {
@@ -47,8 +55,8 @@ class LoginBLoC {
         showError("${snap.documentID} already exists.");
         _loginSuccessStreamSink.add(false);
       } else {
-        QuizState.currentPlayer = new Player(snap.documentID, playerReference);
-        await transaction.set(playerReference, QuizState.currentPlayer.toJson());
+        await transaction.set(playerReference,
+            new Player(snap.documentID, playerReference).toJson());
         _loginSuccessStreamSink.add(true);
       }
     });
