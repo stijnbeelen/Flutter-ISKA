@@ -15,6 +15,13 @@ class QuizPageState extends State<QuizPage> {
 
   num currentQuestionIndex = 1;
 
+  final List<Color> colors = [
+    Colors.blue,
+    Colors.red,
+    Colors.green,
+    Colors.purple
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -22,10 +29,8 @@ class QuizPageState extends State<QuizPage> {
         .add(RequestNewQuestionEvent(currentQuestionIndex.toString()));
   }
 
-  Widget _question(BuildContext context) => Container(
-        margin: EdgeInsets.only(bottom: 70.0),
-        child: _currentQuestion(context),
-      );
+  Widget _question(BuildContext context) =>
+      Container(child: _currentQuestion(context));
 
   Widget _currentQuestion(BuildContext context) => StreamBuilder<Question>(
         stream: bloc.streamReceivedQuestions,
@@ -34,33 +39,15 @@ class QuizPageState extends State<QuizPage> {
             case ConnectionState.waiting:
               return Center(child: LinearProgressIndicator());
             default:
-              return Text(
-                questionSnapshot.data.question,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+              return Center(
+                child: Text(
+                  questionSnapshot.data.question,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                ),
               );
           }
         },
-      );
-
-  Widget _answer(BuildContext context) => TextField(
-        controller: quizController,
-        textAlign: TextAlign.center,
-        decoration: InputDecoration(
-          hintText: 'Answer here.',
-          border: UnderlineInputBorder(
-            borderSide: BorderSide(
-              width: 2.0,
-              style: BorderStyle.solid,
-              color: Colors.blue,
-            ),
-          ),
-        ),
-      );
-
-  Widget _button(BuildContext context) => RaisedButton(
-        onPressed: () => _uploadAnswer(),
-        child: Text("Answer"),
       );
 
   // todo: refactor below code by sending ValidateAnswerEvent to QuizBLoC
@@ -91,23 +78,55 @@ class QuizPageState extends State<QuizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //todo: retrieve user's name from login_bloc somehow
-        //todo: perhaps use a behavior subject in login_bloc?
-        /*title: Text('Quiz - ${QuizState.name}'),*/
         title: Text('Quiz'),
         centerTitle: true,
       ),
-      body: Center(
-        child: Container(
-          width: 300,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _question(context),
-              _answer(context),
-              _button(context),
-            ],
-          ),
+      body: Container(
+        child: Column(
+          children: [
+            Expanded(child: _question(context)),
+            Container(
+              margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+              child: StreamBuilder(
+                stream: bloc.streamReceivedQuestions,
+                builder: (context, snapshot) {
+                  final Question question = snapshot.data;
+                  return GridView.count(
+                    primary: true,
+                    shrinkWrap: true,
+                    crossAxisCount: 2,
+                    children: List.generate(
+                      question?.options?.length ?? 0,
+                      (index) {
+                        return Container(
+                          margin: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: colors[index],
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {},
+                              child: Center(
+                                child: Text(
+                                  question.options[index],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 28,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

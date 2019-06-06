@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iska_quiz/lobby/lobby_page.dart';
 import 'package:iska_quiz/login/login_page.dart';
 import 'package:iska_quiz/quiz/quiz_page.dart';
 
@@ -8,6 +9,7 @@ class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
     LoginPage.tag: (context) => LoginPage(),
     QuizPage.tag: (context) => QuizPage(),
+    LobbyPage.tag: (context) => LobbyPage(),
   };
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:iska_quiz/lobby/lobby_page.dart';
 import 'package:iska_quiz/login/login_bloc.dart';
 import 'package:iska_quiz/quiz/quiz_page.dart';
 import 'package:iska_quiz/widgets/core/iska_button.dart';
@@ -22,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     loginBLoC.streamLoginSuccess.listen((loginSucceeded) {
       if (loginSucceeded)
-        Navigator.of(context).pushReplacementNamed(QuizPage.tag);
+        Navigator.of(context).pushReplacementNamed(LobbyPage.tag);
     });
   }
 

@@ -12,6 +12,7 @@ dependencies:
   cloud_firestore: ^0.12.2
   cupertino_icons: ^0.1.2
   rxdart: ^0.22.0
+  flutter_spinkit: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +22,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/img/is_logo.png
+    - assets/img/bowser_icon.png
+    - assets/img/luigi_icon.png
+    - assets/img/mario_icon.png
+    - assets/img/peach_icon.png
+    - assets/img/toad_icon.png
+    - assets/img/wario_icon.png
+    - assets/img/yoshi_icon.png
