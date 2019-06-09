@@ -61,8 +61,9 @@ class _LobbyPageState extends State<LobbyPage> {
         subtitle: StreamBuilder(
           stream: FirestoreHelper.players.snapshots(),
           builder: (context, snapshot) {
+            final num amountOfPlayers = snapshot.data?.documents?.length ?? 0;
             return Text(
-                '${snapshot.data?.documents?.length ?? 0} players joined');
+                '$amountOfPlayers player${amountOfPlayers > 1 ? 's' : ''} joined');
           },
         ),
       ),
@@ -111,6 +112,18 @@ class _LobbyPageState extends State<LobbyPage> {
             Text(
               document['name'],
               style: TextStyle(fontSize: 20),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 15),
+              child: Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber),
+                  Text(
+                    document['score'].toString(),
+                    style: TextStyle(fontSize: 20),
+                  )
+                ],
+              ),
             ),
           ],
         ),

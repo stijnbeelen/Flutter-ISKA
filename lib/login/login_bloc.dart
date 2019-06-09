@@ -37,7 +37,8 @@ class LoginBLoC {
   void loginRequestReceived(LoginEvent event) async {
     clearError();
     var userRef = FirestoreHelper.players.document(event.playerId);
-    checkAndCreate(event.playerId, userRef);
+    FirestoreHelper.currentPlayer = userRef;
+    await connectToLobby(event.playerId, userRef);
   }
 
   void clearError() {
@@ -48,15 +49,21 @@ class LoginBLoC {
     _loginErrorStreamSink.add(errorString);
   }
 
-  checkAndCreate(String playerId, DocumentReference playerReference) async {
+  connectToLobby(String playerId, DocumentReference playerReference) async {
     await Firestore.instance.runTransaction((Transaction transaction) async {
-      DocumentSnapshot snap = await transaction.get(playerReference);
-      if (snap.exists) {
-        showError("${snap.documentID} already exists.");
-        _loginSuccessStreamSink.add(false);
+      DocumentSnapshot quizSnapshot =
+          await transaction.get(FirestoreHelper.flutterIskaQuiz);
+      /*if (quizSnapshot.data['started']) {
+        showError("The quiz has already started");
+        return;
+      }*/
+
+      DocumentSnapshot playerSnapshot = await transaction.get(playerReference);
+      if (playerSnapshot.exists) {
+        showError("This name is already in use");
       } else {
-        await transaction.set(playerReference,
-            new Player(snap.documentID, playerReference).toJson());
+        await transaction.update(FirestoreHelper.flutterIskaQuiz, {});
+        await transaction.set(playerReference, new Player(playerSnapshot.documentID, playerReference).toJson());
         _loginSuccessStreamSink.add(true);
       }
     });

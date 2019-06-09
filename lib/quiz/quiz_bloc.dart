@@ -14,26 +14,64 @@ class RequestNewQuestionEvent {
   RequestNewQuestionEvent(this._id);
 }
 
-class ValidateAnswerEvent {
-  String _answer;
+class FinalizeAnswerEvent {}
 
-  String get answer => _answer;
+class SelectAnswerEvent {
+  String answer;
 
-  ValidateAnswerEvent(this._answer);
+  SelectAnswerEvent(this.answer);
+}
+
+class AnswerVerificationResult {
+  bool answerWasCorrect;
+
+  AnswerVerificationResult(this.answerWasCorrect);
 }
 
 class QuizBLoC {
-  final _newQuestionRequestEventStreamController = StreamController<RequestNewQuestionEvent>();
-  StreamSink<RequestNewQuestionEvent> get newQuestionRequestEventSink => _newQuestionRequestEventStreamController.sink;
-  Stream<RequestNewQuestionEvent> get _streamNewQuestionRequestEvent => _newQuestionRequestEventStreamController.stream;
+  final _newQuestionRequestEventStreamController =
+      StreamController<RequestNewQuestionEvent>();
 
-  final _validateAnswerEventStreamController = StreamController<ValidateAnswerEvent>();
-  StreamSink<ValidateAnswerEvent> get validateAnswerEventSink => _validateAnswerEventStreamController.sink;
-  Stream<ValidateAnswerEvent> get _streamValidateAnswerEvent => _validateAnswerEventStreamController.stream;
+  StreamSink<RequestNewQuestionEvent> get newQuestionRequestEventSink =>
+      _newQuestionRequestEventStreamController.sink;
+
+  Stream<RequestNewQuestionEvent> get _streamNewQuestionRequestEvent =>
+      _newQuestionRequestEventStreamController.stream;
+
+  final _finalizeAnswerEventStreamController =
+      StreamController<FinalizeAnswerEvent>();
+
+  StreamSink<FinalizeAnswerEvent> get finalizeAnswerEventSink =>
+      _finalizeAnswerEventStreamController.sink;
+
+  Stream<FinalizeAnswerEvent> get _streamFinalizeAnswer =>
+      _finalizeAnswerEventStreamController.stream;
 
   final _questionReceptionStreamController = BehaviorSubject<Question>();
-  StreamSink<Question> get _questionReceptionSink => _questionReceptionStreamController.sink;
-  Stream<Question> get streamReceivedQuestions => _questionReceptionStreamController.stream;
+
+  StreamSink<Question> get _questionReceptionSink =>
+      _questionReceptionStreamController.sink;
+
+  Stream<Question> get streamReceivedQuestions =>
+      _questionReceptionStreamController.stream;
+
+  final _selectAnswerEventStreamController =
+      BehaviorSubject<SelectAnswerEvent>();
+
+  StreamSink<SelectAnswerEvent> get selectAnswerSink =>
+      _selectAnswerEventStreamController.sink;
+
+  Stream<SelectAnswerEvent> get streamSelectAnswerEvent =>
+      _selectAnswerEventStreamController.stream;
+
+  final _answerVerificationResultStreamController =
+      StreamController<AnswerVerificationResult>.broadcast();
+
+  StreamSink<AnswerVerificationResult> get _answerVerificationResultSink =>
+      _answerVerificationResultStreamController.sink;
+
+  Stream<AnswerVerificationResult> get streamAnswerVerificationResult =>
+      _answerVerificationResultStreamController.stream;
 
   void fetchQuestion(RequestNewQuestionEvent event) async {
     DocumentSnapshot documentSnapshot =
@@ -43,18 +81,36 @@ class QuizBLoC {
     }
   }
 
-  void pushAnswer(ValidateAnswerEvent event) {
-    print('answer received');
+  void pushAnswer(FinalizeAnswerEvent event) async {
+    final String chosenAnswer = (await streamSelectAnswerEvent.first).answer;
+    final String correctAnswer = (await streamReceivedQuestions.first).answer;
+    _answerVerificationResultSink
+        .add(AnswerVerificationResult(chosenAnswer == correctAnswer));
+    await FirestoreHelper.flutterIskaQuiz.updateData({'started': false});
+  }
+
+  void listenToAnswerVerifications(AnswerVerificationResult result) async {
+    if (result.answerWasCorrect) {
+      await Firestore.instance.runTransaction((Transaction transaction) async {
+        DocumentSnapshot playerSnapshot =
+            await transaction.get(FirestoreHelper.currentPlayer);
+        await transaction.update(FirestoreHelper.currentPlayer,
+            {'score': (playerSnapshot.data['score'] as num) + 1});
+      });
+    }
   }
 
   QuizBLoC() {
     _streamNewQuestionRequestEvent.listen(fetchQuestion);
-    _streamValidateAnswerEvent.listen(pushAnswer);
+    _streamFinalizeAnswer.listen(pushAnswer);
+    streamAnswerVerificationResult.listen(listenToAnswerVerifications);
   }
 
   dispose() {
     _questionReceptionStreamController.close();
-    _validateAnswerEventStreamController.close();
+    _finalizeAnswerEventStreamController.close();
     _newQuestionRequestEventStreamController.close();
+    _selectAnswerEventStreamController.close();
+    _answerVerificationResultStreamController.close();
   }
 }

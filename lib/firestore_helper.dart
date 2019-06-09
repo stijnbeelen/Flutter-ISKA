@@ -9,4 +9,6 @@ class FirestoreHelper {
 
   static CollectionReference get questions =>
       flutterIskaQuiz.collection('questions');
+
+  static DocumentReference currentPlayer;
 }
