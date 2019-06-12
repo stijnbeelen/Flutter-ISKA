@@ -29,73 +29,45 @@ class AnswerVerificationResult {
 }
 
 class QuizBLoC {
-  final _newQuestionRequestEventStreamController =
-      StreamController<RequestNewQuestionEvent>();
+  final _newQuestionRequestEventStreamController = StreamController<RequestNewQuestionEvent>();
+  StreamSink<RequestNewQuestionEvent> get newQuestionRequestEventSink => _newQuestionRequestEventStreamController.sink;
+  Stream<RequestNewQuestionEvent> get _streamNewQuestionRequestEvent => _newQuestionRequestEventStreamController.stream;
 
-  StreamSink<RequestNewQuestionEvent> get newQuestionRequestEventSink =>
-      _newQuestionRequestEventStreamController.sink;
-
-  Stream<RequestNewQuestionEvent> get _streamNewQuestionRequestEvent =>
-      _newQuestionRequestEventStreamController.stream;
-
-  final _finalizeAnswerEventStreamController =
-      StreamController<FinalizeAnswerEvent>();
-
-  StreamSink<FinalizeAnswerEvent> get finalizeAnswerEventSink =>
-      _finalizeAnswerEventStreamController.sink;
-
-  Stream<FinalizeAnswerEvent> get _streamFinalizeAnswer =>
-      _finalizeAnswerEventStreamController.stream;
+  final _finalizeAnswerEventStreamController = StreamController<FinalizeAnswerEvent>();
+  StreamSink<FinalizeAnswerEvent> get finalizeAnswerEventSink => _finalizeAnswerEventStreamController.sink;
+  Stream<FinalizeAnswerEvent> get _streamFinalizeAnswer => _finalizeAnswerEventStreamController.stream;
 
   final _questionReceptionStreamController = BehaviorSubject<Question>();
+  StreamSink<Question> get _questionReceptionSink => _questionReceptionStreamController.sink;
+  Stream<Question> get streamReceivedQuestions => _questionReceptionStreamController.stream;
 
-  StreamSink<Question> get _questionReceptionSink =>
-      _questionReceptionStreamController.sink;
+  final _selectAnswerEventStreamController = BehaviorSubject<SelectAnswerEvent>();
+  StreamSink<SelectAnswerEvent> get selectAnswerSink => _selectAnswerEventStreamController.sink;
+  Stream<SelectAnswerEvent> get streamSelectAnswerEvent => _selectAnswerEventStreamController.stream;
 
-  Stream<Question> get streamReceivedQuestions =>
-      _questionReceptionStreamController.stream;
-
-  final _selectAnswerEventStreamController =
-      BehaviorSubject<SelectAnswerEvent>();
-
-  StreamSink<SelectAnswerEvent> get selectAnswerSink =>
-      _selectAnswerEventStreamController.sink;
-
-  Stream<SelectAnswerEvent> get streamSelectAnswerEvent =>
-      _selectAnswerEventStreamController.stream;
-
-  final _answerVerificationResultStreamController =
-      StreamController<AnswerVerificationResult>.broadcast();
-
+  final _answerVerificationResultStreamController = StreamController<AnswerVerificationResult>.broadcast();
   StreamSink<AnswerVerificationResult> get _answerVerificationResultSink =>
       _answerVerificationResultStreamController.sink;
-
-  Stream<AnswerVerificationResult> get streamAnswerVerificationResult =>
-      _answerVerificationResultStreamController.stream;
+  Stream<AnswerVerificationResult> get streamAnswerVerificationResult => _answerVerificationResultStreamController.stream;
 
   void fetchQuestion(RequestNewQuestionEvent event) async {
-    DocumentSnapshot documentSnapshot =
-        await FirestoreHelper.questions.document("${event._id}").get();
-    if (documentSnapshot != null && documentSnapshot.exists) {
+    DocumentSnapshot documentSnapshot = await FirestoreHelper.questions.document("${event._id}").get();
+    if (documentSnapshot != null && documentSnapshot.exists)
       _questionReceptionSink.add(Question.fromJson(documentSnapshot.data));
-    }
   }
 
   void pushAnswer(FinalizeAnswerEvent event) async {
     final String chosenAnswer = (await streamSelectAnswerEvent.first).answer;
     final String correctAnswer = (await streamReceivedQuestions.first).answer;
-    _answerVerificationResultSink
-        .add(AnswerVerificationResult(chosenAnswer == correctAnswer));
+    _answerVerificationResultSink.add(AnswerVerificationResult(chosenAnswer == correctAnswer));
     await FirestoreHelper.flutterIskaQuiz.updateData({'started': false});
   }
 
   void listenToAnswerVerifications(AnswerVerificationResult result) async {
     if (result.answerWasCorrect) {
       await Firestore.instance.runTransaction((Transaction transaction) async {
-        DocumentSnapshot playerSnapshot =
-            await transaction.get(FirestoreHelper.currentPlayer);
-        await transaction.update(FirestoreHelper.currentPlayer,
-            {'score': (playerSnapshot.data['score'] as num) + 1});
+        DocumentSnapshot playerSnapshot = await transaction.get(FirestoreHelper.currentPlayer);
+        await transaction.update(FirestoreHelper.currentPlayer, {'score': (playerSnapshot.data['score'] as num) + 1});
       });
     }
   }

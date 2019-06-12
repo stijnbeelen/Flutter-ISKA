@@ -9,10 +9,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  image_picker: ^0.6.0+9
   cloud_firestore: ^0.12.2
+  firebase_storage: ^3.0.1
   cupertino_icons: ^0.1.2
   rxdart: ^0.22.0
   flutter_spinkit: ^3.1.0
+  uuid: ^2.0.1
+  cached_network_image: ^0.8.0
+  progress_button:
+    git:
+      url: https://github.com/mwgriffiths88/ProgressButton.git
 
 dev_dependencies:
   flutter_test:

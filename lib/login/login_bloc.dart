@@ -13,50 +13,40 @@ class LoginEvent {
 }
 
 class LoginBLoC {
-  final _loginEventStreamController = StreamController<LoginEvent>();
-
+  final _loginEventStreamController = StreamController<LoginEvent>.broadcast();
   StreamSink<LoginEvent> get loginEventSink => _loginEventStreamController.sink;
+  Stream<LoginEvent> get streamLoginEvent => _loginEventStreamController.stream;
 
-  Stream<LoginEvent> get _streamLoginEvent =>
-      _loginEventStreamController.stream;
-
-  final _loginErrorStreamController = StreamController<String>();
-
-  StreamSink<String> get _loginErrorStreamSink =>
-      _loginErrorStreamController.sink;
-
+  final _loginErrorStreamController = StreamController<String>.broadcast();
+  StreamSink<String> get loginErrorStreamSink => _loginErrorStreamController.sink;
   Stream<String> get streamLoginError => _loginErrorStreamController.stream;
 
-  final _loginSuccessStreamController = StreamController<bool>();
-
-  StreamSink<bool> get _loginSuccessStreamSink =>
-      _loginSuccessStreamController.sink;
-
+  final _loginSuccessStreamController = StreamController<bool>.broadcast();
+  StreamSink<bool> get _loginSuccessStreamSink => _loginSuccessStreamController.sink;
   Stream<bool> get streamLoginSuccess => _loginSuccessStreamController.stream;
 
   void loginRequestReceived(LoginEvent event) async {
-    clearError();
+    // clearError();
     var userRef = FirestoreHelper.players.document(event.playerId);
     FirestoreHelper.currentPlayer = userRef;
     await connectToLobby(event.playerId, userRef);
   }
 
   void clearError() {
-    _loginErrorStreamSink.add(null);
+    loginErrorStreamSink.add(null);
   }
 
   void showError(String errorString) {
-    _loginErrorStreamSink.add(errorString);
+    loginErrorStreamSink.add(errorString);
   }
 
   connectToLobby(String playerId, DocumentReference playerReference) async {
     await Firestore.instance.runTransaction((Transaction transaction) async {
-      DocumentSnapshot quizSnapshot =
-          await transaction.get(FirestoreHelper.flutterIskaQuiz);
-      /*if (quizSnapshot.data['started']) {
+      DocumentSnapshot quizSnapshot = await transaction.get(FirestoreHelper.flutterIskaQuiz);
+      if (quizSnapshot.data['started']) {
         showError("The quiz has already started");
         return;
-      }*/
+      }
 
       DocumentSnapshot playerSnapshot = await transaction.get(playerReference);
       if (playerSnapshot.exists) {
@@ -70,7 +60,7 @@ class LoginBLoC {
   }
 
   LoginBLoC() {
-    _streamLoginEvent.listen(loginRequestReceived);
+    streamLoginEvent.listen(loginRequestReceived);
   }
 
   dispose() {

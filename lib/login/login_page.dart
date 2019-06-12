@@ -1,42 +1,93 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:iska_quiz/firestore_helper.dart';
 import 'package:iska_quiz/lobby/lobby_page.dart';
 import 'package:iska_quiz/login/login_bloc.dart';
-import 'package:iska_quiz/quiz/quiz_page.dart';
-import 'package:iska_quiz/widgets/core/iska_button.dart';
+import 'package:iska_quiz/widgets/avatar_picker.dart';
 import 'package:iska_quiz/widgets/iska_logo.dart';
 import 'package:iska_quiz/widgets/strings.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:rxdart/rxdart.dart';
+
+import 'package:progress_button/progress_button.dart';
 
 class LoginPage extends StatefulWidget {
-  static String tag = "loginpage";
+  static String tag = 'loginpage';
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final LoginBLoC loginBLoC = LoginBLoC();
-  final TextEditingController usernameController = TextEditingController();
+  final LoginBLoC _loginBloc = LoginBLoC();
+
+  final TextEditingController _usernameController = TextEditingController();
+
+  final StreamController<File> _avatarPickerImageStreamController = StreamController<File>();
+
+  final StreamController<ButtonState> _progressButtonStream = StreamController<ButtonState>();
+
+  Observable<ButtonState> buttonStateStream;
+
+  File _avatarImage;
 
   @override
   void initState() {
     super.initState();
-    loginBLoC.streamLoginSuccess.listen((loginSucceeded) {
-      if (loginSucceeded)
-        Navigator.of(context).pushReplacementNamed(LobbyPage.tag);
-    });
+
+    _loginBloc.streamLoginSuccess.listen(this._onLoginSuccess);
+    _avatarPickerImageStreamController.stream.listen((file) => _avatarImage = file);
+    buttonStateStream = this._mergeStreams();
+    _loginBloc.streamLoginError.listen(this._resetButtonAfter(Duration(milliseconds: 250)));
   }
+
+  void _onLoginSuccess(bool loginSucceeded) async {
+    if (loginSucceeded) {
+      if (_avatarImage != null) {
+        var uuid = Uuid().v4();
+        var firebaseStorageRef = FirebaseStorage.instance.ref().child('$uuid.jpg');
+        await firebaseStorageRef
+            .putFile(_avatarImage)
+            .onComplete;
+        await FirestoreHelper.currentPlayer.updateData({'avatar': '$uuid.jpg'});
+      }
+      Navigator.of(context).pushReplacementNamed(LobbyPage.tag);
+    }
+  }
+
+  Observable<ButtonState> _mergeStreams() {
+    return Observable.merge([
+      _loginBloc.streamLoginEvent.map((event) => ButtonState.inProgress),
+      _loginBloc.streamLoginSuccess.map((event) => ButtonState.normal),
+      _loginBloc.streamLoginError.map((event) => ButtonState.error),
+      _progressButtonStream.stream,
+    ]);
+  }
+
+  Future<void> Function(String error) _resetButtonAfter(Duration duration) =>
+          (String error) async => Future.delayed(duration, () => _progressButtonStream.sink.add(ButtonState.normal));
 
   @override
   void dispose() {
-    usernameController.dispose();
-    loginBLoC.dispose();
+    _usernameController.dispose();
+    _loginBloc.dispose();
+    _avatarPickerImageStreamController.close();
+    _progressButtonStream.close();
     super.dispose();
   }
 
   void _attemptLogin() {
-    final username = usernameController.text;
-    if (username.isNotEmpty) loginBLoC.loginEventSink.add(LoginEvent(username));
+    final String username = _usernameController.text;
+    if (username.isNotEmpty) {
+      _loginBloc.loginEventSink.add(LoginEvent(username));
+    } else {
+      _loginBloc.loginErrorStreamSink.add('Please enter a username');
+    }
   }
 
   @override
@@ -46,15 +97,14 @@ class _LoginPageState extends State<LoginPage> {
         title: Text(Strings.title),
         centerTitle: true,
       ),
-      body: Container(
+      body: Center(
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Padding(
-                padding: EdgeInsets.all(60),
+                padding: EdgeInsets.fromLTRB(30, 30, 30, 10),
                 child: IskaLogo(),
-              ),
+              ), // logo
               Padding(
                 padding: EdgeInsets.all(20),
                 child: Text(
@@ -62,38 +112,53 @@ class _LoginPageState extends State<LoginPage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16),
                 ),
-              ),
+              ), // hype text
               Container(
                 width: 250,
                 margin: EdgeInsets.only(bottom: 10),
                 child: TextField(
-                  controller: this.usernameController,
+                  controller: this._usernameController,
                   decoration: InputDecoration(hintText: 'Username'),
                 ),
-              ),
+              ), // username field
               Container(
                 width: 250,
                 margin: EdgeInsets.all(10),
                 child: StreamBuilder(
-                  stream: loginBLoC.streamLoginError,
+                  stream: _loginBloc.streamLoginError,
                   initialData: null,
-                  builder: (context, snapshot) => snapshot.data != null
+                  builder: (context, snapshot) =>
+                  snapshot.data != null
                       ? Text(
-                          snapshot.data,
-                          style: TextStyle(color: Colors.red),
-                        )
+                    snapshot.data,
+                    style: TextStyle(color: Colors.red),
+                  )
                       : Container(),
                 ),
-              ),
+              ), // login error
+              AvatarPicker(
+                imageListenerSink: _avatarPickerImageStreamController.sink,
+              ), // avatar picker
               Padding(
-                padding: EdgeInsets.fromLTRB(60, 50, 60, 60),
-                child: IskaButton(
-                  onPressed: _attemptLogin,
-                  text: Strings.startQuiz,
-                  width: 250,
-                  height: 70,
+                padding: EdgeInsets.fromLTRB(60, 30, 60, 30),
+                child: StreamBuilder(
+                  initialData: ButtonState.normal,
+                  stream: buttonStateStream,
+                  builder: (context, snapshot) =>
+                      ProgressButton(
+                        child: Text(
+                          Strings.startQuiz,
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                        onPressed: _attemptLogin,
+                        buttonState: snapshot.data,
+                        backgroundColor: Theme
+                            .of(context)
+                            .primaryColor,
+                        progressColor: Colors.white,
+                      ),
                 ),
-              ),
+              ), // button
             ],
           ),
         ),
