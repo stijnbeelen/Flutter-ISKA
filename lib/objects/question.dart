@@ -3,31 +3,16 @@ class Question {
   String question;
   String answer;
   int score;
+  List<String> options;
 
-  Question(this.question, this.answer, this.score);
-
-  Question.empty() {
-    this.id = 0;
-    this.question = "";
-    this.answer = "";
-    this.score = 0;
-  }
+  Question(this.question, this.options, this.answer, this.score);
 
   Question.fromJson(Map<String, dynamic> json) {
     this.id = json.values.first;
     this.question = json['question'];
     this.answer = json['answer'];
     this.score = json['score'];
+    this.options =
+        (json['options'] as List).map((option) => option.toString()).toList();
   }
-
-  Map<String, dynamic> toJson() {
-    return
-      {
-        'id': id,
-        'question': question,
-        'answer' : answer,
-        'score' : score
-      };
-  }
-
 }

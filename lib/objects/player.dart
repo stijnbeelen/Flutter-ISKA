@@ -1,3 +1,4 @@
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -39,6 +40,20 @@ class Player {
       : _name = json['name'],
         _score = json['score'];
 
-  Map<String, dynamic> toJson() => {"name": _name, "score": _score};
+  static const _iconNames = [
+    'bowser',
+    'luigi',
+    'mario',
+    'peach',
+    'toad',
+    'wario',
+    'yoshi'
+  ];
 
+  Map<String, dynamic> toJson() => {
+        "name": _name,
+        "score": _score,
+        "created": FieldValue.serverTimestamp(),
+        "icon": _iconNames[Random().nextInt(_iconNames.length)]
+      };
 }
