@@ -5,6 +5,10 @@ import 'package:iska_quiz/quiz/quiz_bloc.dart';
 class QuizPage extends StatefulWidget {
   static String tag = 'quizpage';
 
+  final int currentQuestionIndex;
+
+  QuizPage(this.currentQuestionIndex);
+
   @override
   State<StatefulWidget> createState() => QuizPageState();
 }
@@ -15,16 +19,13 @@ class QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin 
   AnimationController controller;
   Animation<double> animation;
 
-  num currentQuestionIndex = 1;
-
   final List<Color> colors = [ Colors.blue, Colors.red, Colors.green, Colors.purple];
 
   @override
   void initState() {
     super.initState();
 
-    _quizBloc.newQuestionRequestEventSink
-        .add(RequestNewQuestionEvent(currentQuestionIndex.toString()));
+    _quizBloc.newQuestionRequestEventSink.add(RequestNewQuestionEvent(widget.currentQuestionIndex.toString()));
 
     controller =
     AnimationController(duration: const Duration(seconds: 10), vsync: this)
@@ -39,9 +40,8 @@ class QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin 
 
     controller.forward();
 
-    _quizBloc.streamAnswerVerificationResult.listen(
-            (AnswerVerificationResult result) =>
-            Navigator.of(context).pop());
+    _quizBloc.streamAnswerVerificationResult
+        .listen((AnswerVerificationResult result) => Navigator.of(context).pop());
   }
 
   Widget _question(BuildContext context) =>

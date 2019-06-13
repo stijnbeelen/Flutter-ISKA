@@ -43,7 +43,7 @@ class LoginBLoC {
   connectToLobby(String playerId, DocumentReference playerReference) async {
     await Firestore.instance.runTransaction((Transaction transaction) async {
       DocumentSnapshot quizSnapshot = await transaction.get(FirestoreHelper.flutterIskaQuiz);
-      if (quizSnapshot.data['started']) {
+      if (quizSnapshot.data['currentQuestion'] != 0) {
         showError("The quiz has already started");
         return;
       }
