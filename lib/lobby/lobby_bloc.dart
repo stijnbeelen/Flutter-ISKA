@@ -4,9 +4,7 @@ import '../firestore_helper.dart';
 
 class LobbyBLoC {
   final _gameStateStreamController = StreamController<int>();
-
   StreamSink<int> get _gameStateEventSink => _gameStateStreamController.sink;
-
   Stream<int> get streamGameState => _gameStateStreamController.stream.distinct();
 
   LobbyBLoC() {
