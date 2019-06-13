@@ -29,12 +29,14 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
 
   final StreamController<File> _avatarPickerImageStreamController = StreamController<File>();
+  final StreamController<String> _avatarPickerIconNameStreamController = StreamController<String>();
 
   final StreamController<ButtonState> _progressButtonStream = StreamController<ButtonState>();
 
   Observable<ButtonState> buttonStateStream;
 
   File _avatarImage;
+  String _iconName;
 
   @override
   void initState() {
@@ -42,6 +44,7 @@ class _LoginPageState extends State<LoginPage> {
 
     _loginBloc.streamLoginSuccess.listen(this._onLoginSuccess);
     _avatarPickerImageStreamController.stream.listen((file) => _avatarImage = file);
+    _avatarPickerIconNameStreamController.stream.listen((iconName) => _iconName = iconName);
     buttonStateStream = this._mergeStreams();
     _loginBloc.streamLoginError.listen(this._resetButtonAfter(Duration(milliseconds: 250)));
   }
@@ -77,14 +80,16 @@ class _LoginPageState extends State<LoginPage> {
     _usernameController.dispose();
     _loginBloc.dispose();
     _avatarPickerImageStreamController.close();
+    _avatarPickerIconNameStreamController.close();
     _progressButtonStream.close();
     super.dispose();
   }
 
   void _attemptLogin() {
     final String username = _usernameController.text;
+    final String iconName = _iconName;
     if (username.isNotEmpty) {
-      _loginBloc.loginEventSink.add(LoginEvent(username));
+      _loginBloc.loginEventSink.add(LoginEvent(username, iconName));
     } else {
       _loginBloc.loginErrorStreamSink.add('Please enter a username');
     }
@@ -138,6 +143,7 @@ class _LoginPageState extends State<LoginPage> {
               ), // login error
               AvatarPicker(
                 imageListenerSink: _avatarPickerImageStreamController.sink,
+                iconNameListenerSink: _avatarPickerIconNameStreamController.sink
               ), // avatar picker
               Padding(
                 padding: EdgeInsets.fromLTRB(60, 30, 60, 30),

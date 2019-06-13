@@ -22,8 +22,9 @@ class _LobbyPageState extends State<LobbyPage> {
   @override
   void initState() {
     super.initState();
-    _lobbyBloc.streamGameState.listen((gameStarted) {
-      if (gameStarted) Navigator.of(context).pushNamed(QuizPage.tag);
+    _lobbyBloc.streamGameState.listen((currentQuestion) {
+      if (currentQuestion != 0)
+        Navigator.of(context).pushNamed(QuizPage.tag, arguments: {'questionIndex': currentQuestion});
     });
   }
 

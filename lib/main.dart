@@ -6,9 +6,10 @@ import 'package:iska_quiz/quiz/quiz_page.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  final routes = <String, WidgetBuilder>{
+  final routes = (dynamic arguments) =>
+  <String, WidgetBuilder>{
     LoginPage.tag: (context) => LoginPage(),
-    QuizPage.tag: (context) => QuizPage(),
+    QuizPage.tag: (context) => QuizPage(arguments['questionIndex']),
     LobbyPage.tag: (context) => LobbyPage(),
   };
 
@@ -21,7 +22,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       initialRoute: LoginPage.tag,
-      routes: routes,
+      onGenerateRoute: (RouteSettings settings) =>
+          MaterialPageRoute(builder: (ctx) => routes(settings.arguments)[settings.name](ctx)),
     );
   }
 }
