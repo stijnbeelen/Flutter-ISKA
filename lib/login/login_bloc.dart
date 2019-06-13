@@ -5,11 +5,10 @@ import 'package:iska_quiz/firestore_helper.dart';
 import 'package:iska_quiz/objects/player.dart';
 
 class LoginEvent {
-  String _playerId;
+  String playerId;
+  String iconName;
 
-  String get playerId => _playerId;
-
-  LoginEvent(this._playerId);
+  LoginEvent(this.playerId, this.iconName);
 }
 
 class LoginBLoC {
@@ -29,7 +28,7 @@ class LoginBLoC {
     // clearError();
     var userRef = FirestoreHelper.players.document(event.playerId);
     FirestoreHelper.currentPlayer = userRef;
-    await connectToLobby(event.playerId, userRef);
+    await connectToLobby(event.playerId, event.iconName, userRef);
   }
 
   void clearError() {
@@ -40,7 +39,7 @@ class LoginBLoC {
     loginErrorStreamSink.add(errorString);
   }
 
-  connectToLobby(String playerId, DocumentReference playerReference) async {
+  connectToLobby(String playerId, String iconName, DocumentReference playerReference) async {
     await Firestore.instance.runTransaction((Transaction transaction) async {
       DocumentSnapshot quizSnapshot = await transaction.get(FirestoreHelper.flutterIskaQuiz);
       if (quizSnapshot.data['currentQuestion'] != 0) {
@@ -53,7 +52,7 @@ class LoginBLoC {
         showError("This name is already in use");
       } else {
         await transaction.update(FirestoreHelper.flutterIskaQuiz, {});
-        await transaction.set(playerReference, new Player(playerSnapshot.documentID, playerReference).toJson());
+        await transaction.set(playerReference, Player(playerSnapshot.documentID, playerReference, iconName).toJson());
         _loginSuccessStreamSink.add(true);
       }
     });

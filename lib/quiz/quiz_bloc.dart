@@ -60,7 +60,6 @@ class QuizBLoC {
     final String chosenAnswer = (await streamSelectAnswerEvent.first).answer;
     final String correctAnswer = (await streamReceivedQuestions.first).answer;
     _answerVerificationResultSink.add(AnswerVerificationResult(chosenAnswer == correctAnswer));
-    await FirestoreHelper.flutterIskaQuiz.updateData({'started': false});
   }
 
   void listenToAnswerVerifications(AnswerVerificationResult result) async {
